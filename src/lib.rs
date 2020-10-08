@@ -35,7 +35,8 @@ pub fn main() -> Result<(), JsValue> {
     .unwrap();
 
     let windows: web_sys::Window =web_sys::window().unwrap();
-
+    let width=windows.inner_width()?;
+    let height=windows.inner_height()?;
 
     let context = canvas
     .get_context("2d")
@@ -45,7 +46,8 @@ pub fn main() -> Result<(), JsValue> {
     .unwrap();
     
     // context.width=windows.innerWidth;
-    // context.set_height(windows.innerHeight);
+    canvas.set_width(1360);
+    canvas.set_height(720);
 //context.set_fill_style(&"#0000FF".into());     
     context.set_fill_style(&"rgb(150,50,0)".into());        
 
