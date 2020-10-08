@@ -11,6 +11,17 @@ use wasm_bindgen::JsCast;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(a: &str);
+}
+
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
+
+#[wasm_bindgen]
 extern {
     fn alert(s: &str);
 }
@@ -37,7 +48,9 @@ pub fn main() -> Result<(), JsValue> {
     let windows: web_sys::Window =web_sys::window().unwrap();
     let width=windows.inner_width()?;
     let height=windows.inner_height()?;
-
+    let uwidth=width.as_f64().unwrap();
+    let uheight=height.as_f64().unwrap();
+    console_log!("created module has {}  {} pages of memory",uwidth,uheight );
     let context = canvas
     .get_context("2d")
     .unwrap()
@@ -46,12 +59,19 @@ pub fn main() -> Result<(), JsValue> {
     .unwrap();
     
     // context.width=windows.innerWidth;
-    canvas.set_width(1360);
-    canvas.set_height(720);
+    canvas.set_width(uwidth as u32);
+    canvas.set_height(uheight as u32);
 //context.set_fill_style(&"#0000FF".into());     
-    context.set_fill_style(&"rgb(150,50,0)".into());        
+    context.set_fill_style(&"#000000".into());        
 
-    context.fill_rect(15.0, 15.0, 80.0, 80.0);
+    context.fill_rect(0.0, 0.0, uwidth, uheight);
+
+    context.set_fill_style(&"#076ab0".into());
+    // context.fill_rect(50.0, 50.0 , 100.00, 100.00);
+    for i in 1..5{
+        let temp=(i*100)as f64;
+        context.fill_rect(temp, temp , 100.00, 100.00);
+    }
 
     // web_sys::console::log_2(&"Color : %s ".into(),&context.fill_style().into());
     Ok(())
