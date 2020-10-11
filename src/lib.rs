@@ -4,6 +4,7 @@ mod utils;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -50,14 +51,13 @@ pub fn main() -> Result<(), JsValue> {
     let height=windows.inner_height()?;
     let uwidth=width.as_f64().unwrap();
     let uheight=height.as_f64().unwrap();
-    console_log!("created module has {}  {} pages of memory",uwidth,uheight );
+    console_log!("createdddd module has {}  {} pages of memory",uwidth,uheight );
     let context = canvas
     .get_context("2d")
     .unwrap()
     .unwrap()
     .dyn_into::<web_sys::CanvasRenderingContext2d>()
     .unwrap();
-    
     // context.width=windows.innerWidth;
     canvas.set_width(uwidth as u32);
     canvas.set_height(uheight as u32);
@@ -67,13 +67,27 @@ pub fn main() -> Result<(), JsValue> {
     context.fill_rect(0.0, 0.0, uwidth, uheight);
 
     context.set_fill_style(&"#076ab0".into());
-    // context.fill_rect(50.0, 50.0 , 100.00, 100.00);
-    for i in 1..5{
-        let temp=(i*100)as f64;
-        context.fill_rect(temp, temp , 100.00, 100.00);
-    }
-
+     let mut x1:f64=100.0;
+     let mut y1:f64=100.0;
+    context.fill_rect(x1, y1 , 100.0,100.0);
+   
+    
+            x1+=20.0;
+            y1+=20.0;
+            context.set_fill_style(&"#076ab0".into());
+            context.fill_rect(y1, x1 , 100f64,100f64);
+            console_log!("xxxxx yyyyy xxxxxx");
+    
+    // for i in 1..5{
+    //     let temp=(i*100)as f64;
+    //     context.fill_rect(temp, temp , 100.00, 100.00);
+    // }
+  
     // web_sys::console::log_2(&"Color : %s ".into(),&context.fill_style().into());
+
+
+
+
     Ok(())
 }
 
@@ -81,3 +95,93 @@ pub fn main() -> Result<(), JsValue> {
 pub fn greet() {
     alert("Hello, movesquare!");
 }
+
+#[wasm_bindgen]
+struct block{
+    x:f64,
+    y:f64
+}
+
+#[wasm_bindgen]
+impl block{
+    pub fn new(x1:f64,y1:f64)->block{
+        Self{
+            x:x1,
+            y:y1
+        }
+    }
+
+   pub fn moveblock(&mut self){
+        self.x+=10.0;
+        self.y+=10.0;
+    }
+
+    pub fn draw_block(&self){
+        let window = web_sys::window().expect("no global `window` exists");
+        let document = window.document().expect("should have a document on window");
+        let body = document.body().expect("document should have a body");
+        // let canvas=documen
+        // Manufacture the element we're gonna append
+    
+        let canvas = document.get_element_by_id("canvas").unwrap();
+        // val.set_inner_html("Hello from Rust!");
+    
+        // body.append_child(&val)?;
+        let canvas: web_sys::HtmlCanvasElement = canvas
+        .dyn_into::<web_sys::HtmlCanvasElement>()
+        .map_err(|_| ())
+        .unwrap();
+    
+        let windows: web_sys::Window =web_sys::window().unwrap();
+        let width=windows.inner_width().unwrap();
+        let height=windows.inner_height().unwrap();
+        let uwidth=width.as_f64().unwrap();
+        let uheight=height.as_f64().unwrap();
+        console_log!("createdddd module has {}  {} pages of memory",uwidth,uheight );
+        let context = canvas
+        .get_context("2d")
+        .unwrap()
+        .unwrap()
+        .dyn_into::<web_sys::CanvasRenderingContext2d>()
+        .unwrap();
+        context.set_fill_style(&"#076ab0".into());
+        context.fill_rect(self.x, self.y , 100f64,100f64);
+    }
+}
+
+#[wasm_bindgen]
+pub fn clear_background(){
+    let window = web_sys::window().expect("no global `window` exists");
+    let document = window.document().expect("should have a document on window");
+    let body = document.body().expect("document should have a body");
+    // let canvas=documen
+    // Manufacture the element we're gonna append
+
+    let canvas = document.get_element_by_id("canvas").unwrap();
+    // val.set_inner_html("Hello from Rust!");
+
+    // body.append_child(&val)?;
+    let canvas: web_sys::HtmlCanvasElement = canvas
+    .dyn_into::<web_sys::HtmlCanvasElement>()
+    .map_err(|_| ())
+    .unwrap();
+
+    let windows: web_sys::Window =web_sys::window().unwrap();
+    let width=windows.inner_width().unwrap();
+    let height=windows.inner_height().unwrap();
+    let uwidth=width.as_f64().unwrap();
+    let uheight=height.as_f64().unwrap();
+    console_log!("createdddd module has {}  {} pages of memory",uwidth,uheight );
+    let context = canvas
+    .get_context("2d")
+    .unwrap()
+    .unwrap()
+    .dyn_into::<web_sys::CanvasRenderingContext2d>()
+    .unwrap();
+    // context.width=windows.innerWidth;
+//context.set_fill_style(&"#0000FF".into());     
+    context.set_fill_style(&"#000000".into());        
+
+    context.fill_rect(0.0, 0.0, uwidth, uheight);
+}
+
