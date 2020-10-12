@@ -99,15 +99,27 @@ pub fn greet() {
 #[wasm_bindgen]
 struct block{
     x:f64,
-    y:f64
+    y:f64,
+    window:web_sys::Window,
+    canvas:web_sys::HtmlCanvasElement
 }
 
 #[wasm_bindgen]
 impl block{
     pub fn new(x1:f64,y1:f64)->block{
+        let windows: web_sys::Window =web_sys::window().unwrap();
+        let window = web_sys::window().expect("no global `window` exists");
+        let document = window.document().expect("should have a document on window");
+        let canvas = document.get_element_by_id("canvas").unwrap();
+        let canvass: web_sys::HtmlCanvasElement = canvas
+        .dyn_into::<web_sys::HtmlCanvasElement>()
+        .map_err(|_| ())
+        .unwrap();
         Self{
             x:x1,
-            y:y1
+            y:y1,
+            window:windows,
+            canvas:canvass
         }
     }
 
@@ -117,28 +129,15 @@ impl block{
     }
 
     pub fn draw_block(&self){
-        let window = web_sys::window().expect("no global `window` exists");
-        let document = window.document().expect("should have a document on window");
-        let body = document.body().expect("document should have a body");
-        // let canvas=documen
-        // Manufacture the element we're gonna append
+       
     
-        let canvas = document.get_element_by_id("canvas").unwrap();
-        // val.set_inner_html("Hello from Rust!");
-    
-        // body.append_child(&val)?;
-        let canvas: web_sys::HtmlCanvasElement = canvas
-        .dyn_into::<web_sys::HtmlCanvasElement>()
-        .map_err(|_| ())
-        .unwrap();
-    
-        let windows: web_sys::Window =web_sys::window().unwrap();
-        let width=windows.inner_width().unwrap();
-        let height=windows.inner_height().unwrap();
+        
+        let width=self.window.inner_width().unwrap();
+        let height=self.window.inner_height().unwrap();
         let uwidth=width.as_f64().unwrap();
         let uheight=height.as_f64().unwrap();
         console_log!("createdddd module has {}  {} pages of memory",uwidth,uheight );
-        let context = canvas
+        let context = self.canvas
         .get_context("2d")
         .unwrap()
         .unwrap()
@@ -147,41 +146,30 @@ impl block{
         context.set_fill_style(&"#076ab0".into());
         context.fill_rect(self.x, self.y , 100f64,100f64);
     }
+
+    pub fn clear_background(&self){
+   
+
+    
+        let width=self.window.inner_width().unwrap();
+        let height=self.window.inner_height().unwrap();
+        let uwidth=width.as_f64().unwrap();
+        let uheight=height.as_f64().unwrap();
+        console_log!("createdddd module has {}  {} pages of memory",uwidth,uheight );
+        let context = self.canvas
+        .get_context("2d")
+        .unwrap()
+        .unwrap()
+        .dyn_into::<web_sys::CanvasRenderingContext2d>()
+        .unwrap();
+        // context.width=windows.innerWidth;
+    //context.set_fill_style(&"#0000FF".into());     
+        context.set_fill_style(&"#000000".into());        
+    
+        context.fill_rect(0.0, 0.0, uwidth, uheight);
+    }
 }
 
-#[wasm_bindgen]
-pub fn clear_background(){
-    let window = web_sys::window().expect("no global `window` exists");
-    let document = window.document().expect("should have a document on window");
-    let body = document.body().expect("document should have a body");
-    // let canvas=documen
-    // Manufacture the element we're gonna append
 
-    let canvas = document.get_element_by_id("canvas").unwrap();
-    // val.set_inner_html("Hello from Rust!");
 
-    // body.append_child(&val)?;
-    let canvas: web_sys::HtmlCanvasElement = canvas
-    .dyn_into::<web_sys::HtmlCanvasElement>()
-    .map_err(|_| ())
-    .unwrap();
-
-    let windows: web_sys::Window =web_sys::window().unwrap();
-    let width=windows.inner_width().unwrap();
-    let height=windows.inner_height().unwrap();
-    let uwidth=width.as_f64().unwrap();
-    let uheight=height.as_f64().unwrap();
-    console_log!("createdddd module has {}  {} pages of memory",uwidth,uheight );
-    let context = canvas
-    .get_context("2d")
-    .unwrap()
-    .unwrap()
-    .dyn_into::<web_sys::CanvasRenderingContext2d>()
-    .unwrap();
-    // context.width=windows.innerWidth;
-//context.set_fill_style(&"#0000FF".into());     
-    context.set_fill_style(&"#000000".into());        
-
-    context.fill_rect(0.0, 0.0, uwidth, uheight);
-}
 
