@@ -100,6 +100,7 @@ pub fn greet() {
 struct block{
     x:f64,
     y:f64,
+    segement:u32,
     window:web_sys::Window,
     canvas:web_sys::HtmlCanvasElement
 }
@@ -118,14 +119,23 @@ impl block{
         Self{
             x:x1,
             y:y1,
+            segement:0,
             window:windows,
             canvas:canvass
         }
     }
 
    pub fn moveblock(&mut self){
-        self.x+=10.0;
-        self.y+=10.0;
+        // self.x+=10.0;
+        // self.y+=10.0;
+        let theta = 2.0f32 * 3.1415926f32 *self.segement as f32 / 20f32;//get the current angle 
+        self.segement+=1;
+        if  self.segement>=20{
+            self.segement=0;
+        }
+        self.x = (100f32 * theta.cos()).into();//calculate the x component 
+        self.y = (100f32 * theta.sin()).into();//calculate the y component 
+       
     }
 
     pub fn draw_block(&self){
