@@ -3,6 +3,7 @@ mod utils;
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use rand::Rng;
 
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -96,11 +97,44 @@ pub fn greet() {
     alert("Hello, movesquare!");
 }
 
-#[wasm_bindgen]
-struct block{
+struct minions{
     x:f64,
     y:f64,
-    segement:u32,
+    mx:f64,
+    my:f64,
+    segement:u32
+}
+
+impl minions{
+    pub fn new()->Self{
+        let mut rng = rand::thread_rng();
+        Self{
+            x:rng.gen_range(0, 1360)as f64,
+            y:rng.gen_range(0, 720)as f64,
+            mx:0f64,
+            my:0f64,
+            segement:20u32
+        }
+    }
+
+    pub fn moveblock(&mut self){  
+        let theta = 2.0f32 * 3.1415926f32 *self.segement as f32 / 20f32;//get the current angle 
+        self.segement+=1;
+        if  self.segement>=20{
+            self.segement=0;
+        }
+        self.mx = (100f32 * theta.cos()).into();//calculate the x component 
+        self.mx+=self.x;
+        self.my = (100f32 * theta.sin()).into();//calculate the y component
+        self.my+=self.y; 
+       
+    }
+
+}
+
+#[wasm_bindgen]
+struct block{
+    arr:[minions;12],
     window:web_sys::Window,
     canvas:web_sys::HtmlCanvasElement
 }
@@ -116,10 +150,12 @@ impl block{
         .dyn_into::<web_sys::HtmlCanvasElement>()
         .map_err(|_| ())
         .unwrap();
+        let mut arw:[minions;12];
+        for i in 0..12{
+            arw[i]=minions::new();
+        }
         Self{
-            x:x1,
-            y:y1,
-            segement:0,
+            arr:arw,
             window:windows,
             canvas:canvass
         }
@@ -128,13 +164,9 @@ impl block{
    pub fn moveblock(&mut self){
         // self.x+=10.0;
         // self.y+=10.0;
-        let theta = 2.0f32 * 3.1415926f32 *self.segement as f32 / 20f32;//get the current angle 
-        self.segement+=1;
-        if  self.segement>=20{
-            self.segement=0;
-        }
-        self.x = (100f32 * theta.cos()).into();//calculate the x component 
-        self.y = (100f32 * theta.sin()).into();//calculate the y component 
+      for k in 0..12{
+        self.arr[k].moveblock();
+      }
        
     }
 
@@ -154,7 +186,9 @@ impl block{
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
         context.set_fill_style(&"#076ab0".into());
-        context.fill_rect(self.x, self.y , 100f64,100f64);
+        for k in 0..12{
+        context.fill_rect(self.arr[k].x, self.arr[k].y , 100f64,100f64);
+        }
     }
 
     pub fn clear_background(&self){
