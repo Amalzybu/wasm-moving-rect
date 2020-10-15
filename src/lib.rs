@@ -97,6 +97,7 @@ pub fn greet() {
     alert("Hello, movesquare!");
 }
 
+#[wasm_bindgen]
 struct minions{
     x:f64,
     y:f64,
@@ -105,6 +106,7 @@ struct minions{
     segement:u32
 }
 
+#[wasm_bindgen]
 impl minions{
     pub fn new()->Self{
         let mut rng = rand::thread_rng();
@@ -141,7 +143,7 @@ struct block{
 
 #[wasm_bindgen]
 impl block{
-    pub fn new(x1:f64,y1:f64)->block{
+    pub fn new()->block{
         let windows: web_sys::Window =web_sys::window().unwrap();
         let window = web_sys::window().expect("no global `window` exists");
         let document = window.document().expect("should have a document on window");
@@ -150,10 +152,8 @@ impl block{
         .dyn_into::<web_sys::HtmlCanvasElement>()
         .map_err(|_| ())
         .unwrap();
-        let mut arw:[minions;12];
-        for i in 0..12{
-            arw[i]=minions::new();
-        }
+        let mut arw:[minions;12]=[minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new()];
+       
         Self{
             arr:arw,
             window:windows,
@@ -186,9 +186,10 @@ impl block{
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
         context.set_fill_style(&"#076ab0".into());
-        for k in 0..12{
-        context.fill_rect(self.arr[k].x, self.arr[k].y , 100f64,100f64);
-        }
+        // for k in 0..12{
+        // context.fill_rect(self.arr[k].x, self.arr[k].y , 100f64,100f64);
+        // }
+        context.fill_rect(0f64, 0f64 , 100f64,100f64);
     }
 
     pub fn clear_background(&self){
