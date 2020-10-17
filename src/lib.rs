@@ -1,9 +1,10 @@
 mod utils;
 
-
+extern crate rand;
+use crate::rand::Rng;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use rand::Rng;
+
 
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -136,7 +137,7 @@ impl minions{
 
 #[wasm_bindgen]
 struct block{
-    arr:[minions;12],
+    arr:Vec<minions>,
     window:web_sys::Window,
     canvas:web_sys::HtmlCanvasElement
 }
@@ -144,6 +145,7 @@ struct block{
 #[wasm_bindgen]
 impl block{
     pub fn new()->block{
+        utils::set_panic_hook();
         let windows: web_sys::Window =web_sys::window().unwrap();
         let window = web_sys::window().expect("no global `window` exists");
         let document = window.document().expect("should have a document on window");
@@ -152,7 +154,10 @@ impl block{
         .dyn_into::<web_sys::HtmlCanvasElement>()
         .map_err(|_| ())
         .unwrap();
-        let mut arw:[minions;12]=[minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new(),minions::new()];
+        let mut arw=Vec::<minions>::new();
+        for i in 0..12{
+            arw.push(minions::new())
+        }
        
         Self{
             arr:arw,
@@ -164,8 +169,8 @@ impl block{
    pub fn moveblock(&mut self){
         // self.x+=10.0;
         // self.y+=10.0;
-      for k in 0..12{
-        self.arr[k].moveblock();
+      for k in self.arr.iter_mut(){
+        k.moveblock();
       }
        
     }
@@ -186,10 +191,10 @@ impl block{
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
         context.set_fill_style(&"#076ab0".into());
-        // for k in 0..12{
-        // context.fill_rect(self.arr[k].x, self.arr[k].y , 100f64,100f64);
-        // }
-        context.fill_rect(0f64, 0f64 , 100f64,100f64);
+        for k in self.arr.iter(){
+        context.fill_rect(k.mx, k.my , 100f64,100f64);
+        }
+        
     }
 
     pub fn clear_background(&self){
