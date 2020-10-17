@@ -29,8 +29,10 @@ extern {
     fn alert(s: &str);
 }
 
+
 #[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
+    
     // Use `web_sys`'s global `window` function to get a handle on the global
     // window object.
     let window = web_sys::window().expect("no global `window` exists");
@@ -98,12 +100,19 @@ pub fn greet() {
     alert("Hello, movesquare!");
 }
 
+enum minionbehaviour{
+    circular,
+    airbubble,
+}
+
 #[wasm_bindgen]
 struct minions{
     x:f64,
     y:f64,
     mx:f64,
     my:f64,
+    speed:f64,
+    otype:minionbehaviour,
     segement:u32
 }
 
@@ -116,20 +125,34 @@ impl minions{
             y:rng.gen_range(0, 720)as f64,
             mx:0f64,
             my:0f64,
+            speed:rng.gen_range(0, 100)as f64,
+            otype:if rng.gen_range(1, 4)%2==0{minionbehaviour::airbubble}else{minionbehaviour::circular},
             segement:20u32
         }
     }
 
     pub fn moveblock(&mut self){  
+        match (self.otype){
+     minionbehaviour::circular=>{
         let theta = 2.0f32 * 3.1415926f32 *self.segement as f32 / 20f32;//get the current angle 
         self.segement+=1;
         if  self.segement>=20{
             self.segement=0;
         }
-        self.mx = (100f32 * theta.cos()).into();//calculate the x component 
+        self.mx = (self.speed as f32 * theta.cos()).into();//calculate the x component 
         self.mx+=self.x;
-        self.my = (100f32 * theta.sin()).into();//calculate the y component
+        self.my = (self.speed as f32 * theta.sin()).into();//calculate the y component
         self.my+=self.y; 
+        },
+        minionbehaviour::airbubble=>{
+            self.my+=self.speed/10f64;
+             self.mx=self.x;
+            if(self.my>=720f64){
+               
+                self.my=0f64;
+            }
+        }
+    }
        
     }
 
@@ -155,7 +178,7 @@ impl block{
         .map_err(|_| ())
         .unwrap();
         let mut arw=Vec::<minions>::new();
-        for i in 0..12{
+        for i in 0..30{
             arw.push(minions::new())
         }
        
@@ -190,10 +213,28 @@ impl block{
         .unwrap()
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .unwrap();
-        context.set_fill_style(&"#076ab0".into());
+        
         for k in self.arr.iter(){
-        context.fill_rect(k.mx, k.my , 100f64,100f64);
-        }
+            if  let minionbehaviour::airbubble=k.otype{
+            context.set_fill_style(&"#076ab0".into());
+            }
+            else{
+                context.set_fill_style(&"#32a852".into());
+            }
+        // context.fill_rect(k.mx, k.my , 100f64,100f64);
+        
+        context.begin_path();
+        // Draw the outer circle.
+        context
+        .arc(k.mx, k.my, 50.0, 0.0, std::f64::consts::PI * 2.0)
+        .unwrap();
+
+    
+        context.fill();
+    context.stroke();
+    }
+
+        
         
     }
 
